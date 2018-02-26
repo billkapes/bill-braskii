@@ -1,4 +1,4 @@
-﻿using System.Collections;
+﻿ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -39,9 +39,13 @@ public class PlayerController : MonoBehaviour {
 			}
 		}
 
-		//Debug.Log("" + transform.rotation.y);
-		//Debug.Log("" + Quaternion.Angle(Quaternion.identity, transform.rotation));
-		Debug.Log("" + transform.rotation.ToAngleAxis());
+//		Debug.Log("transform.rotation.y " + transform.rotation.y);
+//		Debug.Log("quaternion.angle " + Quaternion.Angle(Quaternion.Euler(Vector3.zero), transform.rotation));
+		float angle = transform.eulerAngles.y;
+		angle = (angle > 180) ? angle - 360 : angle;
+		Debug.Log("transform.eulerangles.y " + angle);
+
+		//Debug.Log("transform.rotation.toangleaxis" + transform.rotation.ToAngleAxis());
 
 
 		if (Input.GetKeyUp(KeyCode.Space)) {

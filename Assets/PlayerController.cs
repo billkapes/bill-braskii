@@ -6,11 +6,11 @@ public class PlayerController : MonoBehaviour {
 	bool goRight, isLerping, keyUp;
 	ParticleSystem myParticles;
 
-	public float speed = 1f, lerpTime, maxLerpTime = 1f, rotationAngle = 45f;
+	public float speed = 1f, lerpTime, maxLerpTime = 1f, rotationAngle = 45f, rotateFactor = 1f, minAngle = 25f;
 	public Vector3 leftPath, rightPath;
 
 
-	float tempAngle;
+	float tempAngle, startAngle;
 
 	// Use this for initialization
 	void Start () {
@@ -20,18 +20,21 @@ public class PlayerController : MonoBehaviour {
 		myParticles = GetComponentInChildren<ParticleSystem> ();
 		var em = myParticles.emission;
 		em.enabled = false;
-		tempAngle = rotationAngle;
+		startAngle = 45f;
 	}
 	
 	// Update is called once per frame
 	void Update () {
-		lerpTime += Time.deltaTime * 1.25f;
+		lerpTime += Time.deltaTime * rotateFactor;
 
 		if (Input.GetKeyDown(KeyCode.Space)) {
-			tempAngle = rotationAngle;
-			keyUp = false;
+			//if (keyUp && lerpTime < 0.5f) return;
+
+			startAngle = transform.eulerAngles.y;
+			startAngle = (startAngle > 180) ? startAngle - 360 : startAngle;
 			goRight = !goRight;
 			isLerping = true;
+
 			if (lerpTime >= 1f) {
 				lerpTime = 0f;
 			} else {
@@ -41,23 +44,25 @@ public class PlayerController : MonoBehaviour {
 
 //		Debug.Log("transform.rotation.y " + transform.rotation.y);
 //		Debug.Log("quaternion.angle " + Quaternion.Angle(Quaternion.Euler(Vector3.zero), transform.rotation));
-		float angle = transform.eulerAngles.y;
-		angle = (angle > 180) ? angle - 360 : angle;
-		Debug.Log("transform.eulerangles.y " + angle);
+//		float angle = transform.eulerAngles.y;
+//		angle = (angle > 180) ? angle - 360 : angle;
+//		Debug.Log("transform.eulerangles.y " + angle);
 
 		//Debug.Log("transform.rotation.toangleaxis" + transform.rotation.ToAngleAxis());
 
 
 		if (Input.GetKeyUp(KeyCode.Space)) {
 			keyUp = true;
-			//tempAngle = Mathf.Min( tempAngle * lerpTime, rotationAngle);
 		}
 
 		if (keyUp) {
-			if (goRight && (transform.rotation.y < 0f)) {
+			float angle = transform.eulerAngles.y;
+			angle = (angle > 180) ? angle - 360 : angle;
+
+			if (goRight && (angle < -minAngle)) {
 				keyUp = false;
 				isLerping = false;
-			} else if (!goRight && (transform.rotation.y > 0f)) {
+			} else if (!goRight && (angle > minAngle)) {
 				keyUp = false;
 				isLerping = false;				
 			}
@@ -69,18 +74,18 @@ public class PlayerController : MonoBehaviour {
 		}
 
 		if (goRight) {
-			transform.SetPositionAndRotation(transform.position - transform.forward * speed * Time.deltaTime, Quaternion.AngleAxis( Mathf.Lerp(tempAngle, -tempAngle, lerpTime), Vector3.up));
-			//transform.Rotate( new Vector3(0f, Mathf.Lerp(-rotationAngle, rotationAngle, lerpTime), 0f));
-			//transform.rotation.eulerAngles = Vector3.Lerp(Vector3.up * rotationAngle, Vector3.up * -rotationAngle, lerpTime);	
+			transform.SetPositionAndRotation(transform.position - transform.forward * speed * Time.deltaTime,
+												Quaternion.AngleAxis( Mathf.Lerp(startAngle, -rotationAngle, lerpTime), Vector3.up)
+											);
 		} else {
-			transform.SetPositionAndRotation(transform.position - transform.forward * speed * Time.deltaTime, Quaternion.AngleAxis(Mathf.Lerp(-tempAngle, tempAngle, lerpTime), Vector3.up));
-			//transform.Rotate( new Vector3(0f, Mathf.Lerp(rotationAngle, -rotationAngle, lerpTime), 0f));
-			//transform.rotation.eulerAngles = Vector3.Lerp(Vector3.up * -rotationAngle, Vector3.up * rotationAngle, lerpTime);
+			transform.SetPositionAndRotation(transform.position - transform.forward * speed * Time.deltaTime,
+												Quaternion.AngleAxis(Mathf.Lerp(startAngle, rotationAngle, lerpTime), Vector3.up)
+											);
 		}
 
 		//transform.position += -transform.forward * speed * Time.deltaTime;
 
-
+	
 
 
 

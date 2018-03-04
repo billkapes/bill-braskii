@@ -1,15 +1,17 @@
 ﻿ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class PlayerController : MonoBehaviour {
 	bool goRight, isLerping, keyUp;
 	ParticleSystem myParticles;
-
+	AudioSource myAS;
 	public float speed = 1f, lerpTime, maxLerpTime = 1f, rotationAngle = 45f, rotateFactor = 1f, minAngle = 25f;
 	public Vector3 leftPath, rightPath;
-
-
+	public Text scoreText;
+	int score;
 	float tempAngle, startAngle;
 
 	// Use this for initialization
@@ -18,9 +20,13 @@ public class PlayerController : MonoBehaviour {
 		isLerping = true;
 		lerpTime = 1f;
 		myParticles = GetComponentInChildren<ParticleSystem> ();
+		myAS = GetComponent<AudioSource>();
 		var em = myParticles.emission;
 		em.enabled = false;
 		startAngle = 45f;
+		score = 0;
+		scoreText.text = "score: " + score;
+
 	}
 	
 	// Update is called once per frame
@@ -93,11 +99,16 @@ public class PlayerController : MonoBehaviour {
 
 
 	void OnTriggerEnter(Collider other) {
-		//Debug.Log ("hit trigger");
+		if (other.tag == "Tree") {
+			scoreText.text = "score: " + ++score;
+			myAS.Play();
+		}
 	}
 
 	void OnCollisionEnter(Collision other) {
-		Debug.Log ("hit collider");
+		if (other.gameObject.tag == "Tree") {
+			SceneManager.LoadScene("Main");
+		}
 
 	}
 		
